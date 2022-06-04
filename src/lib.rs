@@ -69,7 +69,7 @@ pub struct Location(f64, f64);
 
 /// Location defines a point using it's latitude and longitude.
 #[cfg(feature = "ordered-float")]
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, Hash, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Location(OrderedFloat<f64>, OrderedFloat<f64>);
 
