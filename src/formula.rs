@@ -5,6 +5,9 @@ use std::fmt;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "ordered-float")]
+use ordered_float::OrderedFloat;
+
 /// Distance represents a physical distance in a certain unit.
 #[derive(Debug, PartialEq, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -180,7 +183,16 @@ pub fn center_of_coords(coords: &[&Location]) -> Location {
     let lat = lat.to_degrees();
     let lat = (lat * 10.0_f64.powi(6)).round() / 10.0_f64.powi(6);
 
-    Location(lat, lon)
+    #[cfg(not(feature = "ordered-float"))]
+    {
+        Location(lat, lon)
+    }
+
+    #[cfg(feature = "ordered-float")]
+    {
+        Location(OrderedFloat(lat), OrderedFloat(lon))
+    }
+
 }
 
 /// Implementation of Haversine distance between two points.

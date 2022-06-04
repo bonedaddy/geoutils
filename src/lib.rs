@@ -56,27 +56,59 @@ mod formula;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "ordered-float")]
+use ordered_float::OrderedFloat;
+
 pub use formula::Distance;
 
 /// Location defines a point using it's latitude and longitude.
+#[cfg(not(feature = "ordered-float"))]
 #[derive(Debug, PartialEq, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Location(f64, f64);
 
+/// Location defines a point using it's latitude and longitude.
+#[cfg(feature = "ordered-float")]
+#[derive(Debug, PartialEq, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Location(OrderedFloat<f64>, OrderedFloat<f64>);
+
 impl Location {
     /// Create a new Location with it's degree values of latitude and longitude.
+    #[cfg(not(feature = "ordered-float"))]
     pub fn new<T: Into<f64>>(lat: T, lon: T) -> Self {
+        #[cfg(not(feature = "ordered-float"))]
         Location(lat.into(), lon.into())
     }
 
+    /// Create a new Location with it's degree values of latitude and longitude.
+    #[cfg(feature = "ordered-float")]
+    pub fn new<T: Into<f64>>(lat: T, lon: T) -> Self {
+        Location(OrderedFloat(lat.into()), OrderedFloat(lon.into()))
+    }
+    
     /// Get the latitude.
+    #[cfg(not(feature = "ordered-float"))]
     pub fn latitude(&self) -> f64 {
         self.0
     }
 
+    /// Get the latitude.
+    #[cfg(feature = "ordered-float")]
+    pub fn latitude(&self) -> f64 {
+        self.0.0
+    }  
+
     /// Get the longitude.
+    #[cfg(not(feature = "ordered-float"))]
     pub fn longitude(&self) -> f64 {
         self.1
+    }
+
+    /// Get the longitude.
+    #[cfg(feature = "ordered-float")]
+    pub fn longitude(&self) -> f64 {
+        self.1.0
     }
 
     /// Find the distance from itself to another point. Internally uses Vincenty's inverse formula.
